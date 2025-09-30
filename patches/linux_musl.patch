@@ -1,0 +1,50 @@
+diff --git a/src/Mono.Unix/Mono.Unix.proj b/src/Mono.Unix/Mono.Unix.proj
+index 82e43a1..b4c1de8 100644
+--- a/src/Mono.Unix/Mono.Unix.proj
++++ b/src/Mono.Unix/Mono.Unix.proj
+@@ -67,6 +67,26 @@
+       <HasSharedLibrary>true</HasSharedLibrary>
+     </_NativeLib>
+ 
++    <_NativeLib Include="host-linux-musl-x64" Condition=" '$([MSBuild]::IsOSPlatform(Linux))' == 'true' or '$(PackageAllNativeLibs)' == 'true' ">
++      <RuntimeIdentifier>linux-musl-x64</RuntimeIdentifier>
++      <LibraryPrefix>$(_LinuxLibraryPrefix)</LibraryPrefix>
++      <SharedSuffix>$(_LinuxSharedNativeLibrarySuffix)</SharedSuffix>
++      <StaticSuffix>$(_LinuxStaticNativeLibrarySuffix)</StaticSuffix>
++      <DebugSuffix>$(_LinuxDebugNativeLibrarySuffix)</DebugSuffix>
++      <HasDebugLibrary>$(_LinuxHasDebugNativeLibrary)</HasDebugLibrary>
++      <HasSharedLibrary>true</HasSharedLibrary>
++    </_NativeLib>
++
++    <_NativeLib Include="host-linux-musl-arm64" Condition=" '$([MSBuild]::IsOSPlatform(Linux))' == 'true' or '$(PackageAllNativeLibs)' == 'true' ">
++      <RuntimeIdentifier>linux-musl-arm64</RuntimeIdentifier>
++      <LibraryPrefix>$(_LinuxLibraryPrefix)</LibraryPrefix>
++      <SharedSuffix>$(_LinuxSharedNativeLibrarySuffix)</SharedSuffix>
++      <StaticSuffix>$(_LinuxStaticNativeLibrarySuffix)</StaticSuffix>
++      <DebugSuffix>$(_LinuxDebugNativeLibrarySuffix)</DebugSuffix>
++      <HasDebugLibrary>$(_LinuxHasDebugNativeLibrary)</HasDebugLibrary>
++      <HasSharedLibrary>true</HasSharedLibrary>
++    </_NativeLib>
++
+     <_NativeLib Include="host-darwin-x64" Condition=" '$([MSBuild]::IsOSPlatform(OSX))' == 'true' or '$(PackageAllNativeLibs)' == 'true' ">
+       <RuntimeIdentifier>osx-x64</RuntimeIdentifier>
+       <LibraryPrefix>$(_DarwinLibraryPrefix)</LibraryPrefix>
+diff --git a/src/Mono.Unix/Mono.Unix.targets b/src/Mono.Unix/Mono.Unix.targets
+index da5fc32..0e51972 100644
+--- a/src/Mono.Unix/Mono.Unix.targets
++++ b/src/Mono.Unix/Mono.Unix.targets
+@@ -33,6 +33,14 @@
+       <DSOExtension>so</DSOExtension>
+       <FolderName>%(Identity)</FolderName>
+     </_MonoUnixRuntimeId>
++    <_MonoUnixRuntimeId Include="linux-musl-x64">
++      <DSOExtension>so</DSOExtension>
++      <FolderName>%(Identity)</FolderName>
++    </_MonoUnixRuntimeId>
++    <_MonoUnixRuntimeId Include="linux-musl-arm64">
++      <DSOExtension>so</DSOExtension>
++      <FolderName>%(Identity)</FolderName>
++    </_MonoUnixRuntimeId>
+     <_MonoUnixRuntimeId Include="osx-arm64">
+       <DSOExtension>dylib</DSOExtension>
+       <FolderName>%(Identity)</FolderName>
