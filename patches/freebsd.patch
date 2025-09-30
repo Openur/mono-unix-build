@@ -1,0 +1,46 @@
+diff --git a/src/Mono.Unix/Mono.Unix.proj b/src/Mono.Unix/Mono.Unix.proj
+index 82e43a1..9ae3d39 100644
+--- a/src/Mono.Unix/Mono.Unix.proj
++++ b/src/Mono.Unix/Mono.Unix.proj
+@@ -26,6 +26,14 @@
+     <_DarwinHasDebugNativeLibrary>false</_DarwinHasDebugNativeLibrary>
+   </PropertyGroup>
+ 
++  <PropertyGroup>
++    <_FreeBSDLibraryPrefix>lib</_FreeBSDLibraryPrefix>
++    <_FreeBSDSharedNativeLibrarySuffix>so</_FreeBSDSharedNativeLibrarySuffix>
++    <_FreeBSDStaticNativeLibrarySuffix>a</_FreeBSDStaticNativeLibrarySuffix>
++    <_FreeBSDDebugNativeLibrarySuffix></_FreeBSDDebugNativeLibrarySuffix>
++    <_FreeBSDHasDebugNativeLibrary>false</_FreeBSDHasDebugNativeLibrary>
++  </PropertyGroup>
++
+   <ItemGroup>
+     <_NativeLib Include="host-linux-x64" Condition=" '$([MSBuild]::IsOSPlatform(Linux))' == 'true' or '$(PackageAllNativeLibs)' == 'true' ">
+       <RuntimeIdentifier>linux-x64</RuntimeIdentifier>
+@@ -216,6 +224,26 @@
+       <HasDebugLibrary>$(_DarwinHasDebugNativeLibrary)</HasDebugLibrary>
+       <HasSharedLibrary>false</HasSharedLibrary>
+     </_NativeLib>
++
++    <_NativeLib Include="host-freebsd-x64" Condition=" '$([MSBuild]::IsOSPlatform(FreeBSD))' == 'true' or '$(PackageAllNativeLibs)' == 'true' ">
++      <RuntimeIdentifier>freebsd-x64</RuntimeIdentifier>
++      <LibraryPrefix>$(_FreeBSDLibraryPrefix)</LibraryPrefix>
++      <SharedSuffix>$(_FreeBSDSharedNativeLibrarySuffix)</SharedSuffix>
++      <StaticSuffix>$(_FreeBSDStaticNativeLibrarySuffix)</StaticSuffix>
++      <DebugSuffix>$(_FreeBSDDebugNativeLibrarySuffix)</DebugSuffix>
++      <HasDebugLibrary>$(_FreeBSDHasDebugNativeLibrary)</HasDebugLibrary>
++      <HasSharedLibrary>true</HasSharedLibrary>
++    </_NativeLib>
++
++    <_NativeLib Include="host-freebsd-arm64" Condition=" '$([MSBuild]::IsOSPlatform(FreeBSD))' == 'true' or '$(PackageAllNativeLibs)' == 'true' ">
++      <RuntimeIdentifier>freebsd-arm64</RuntimeIdentifier>
++      <LibraryPrefix>$(_FreeBSDLibraryPrefix)</LibraryPrefix>
++      <SharedSuffix>$(_FreeBSDSharedNativeLibrarySuffix)</SharedSuffix>
++      <StaticSuffix>$(_FreeBSDStaticNativeLibrarySuffix)</StaticSuffix>
++      <DebugSuffix>$(_FreeBSDDebugNativeLibrarySuffix)</DebugSuffix>
++      <HasDebugLibrary>$(_FreeBSDHasDebugNativeLibrary)</HasDebugLibrary>
++      <HasSharedLibrary>true</HasSharedLibrary>
++    </_NativeLib>
+   </ItemGroup>
+ 
+   <ItemGroup>

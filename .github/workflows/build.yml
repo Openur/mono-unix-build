@@ -1,0 +1,446 @@
+name: Build
+
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build.yml
+  pull_request:
+    branches:
+      - main
+    paths:
+      - .github/workflows/build.yml
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  DOTNET_SKIP_FIRST_TIME_EXPERIENCE: 1
+  DOTNET_CLI_TELEMETRY_OPTOUT: 1
+  DOTNET_NOLOGO: 1
+
+jobs:
+  glibc:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Build
+        uses: docker://docker.io/debian:bullseye
+        with:
+          args: /bin/sh -c "apt-get update && apt-get --yes install build-essential ninja-build g++-arm-linux-gnueabihf g++-aarch64-linux-gnu && ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release host"
+
+      - name: List artifacts
+        run: ls -lR build/artifacts/*-release/lib/*
+
+  prepare:
+    runs-on: ubuntu-latest
+    outputs:
+      version_prefix: ${{ steps.variables.outputs.version_prefix }}
+    steps:
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Install xmllint
+        run: |
+          sudo apt update
+          sudo apt install -y libxml2-utils
+
+      - name: Setup variables
+        id: variables
+        shell: bash
+        run: |
+          VERSION_PREFIX=$(xmllint --xpath '/*[local-name()="Project"]/*[local-name()="PropertyGroup"]/*[local-name()="VersionPrefix"]/text()' build/eng/Versions.props)
+
+          echo "version_prefix=${VERSION_PREFIX}" >> "$GITHUB_OUTPUT"
+
+  build_linux:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get --show-upgraded --yes install ninja-build g++-arm-linux-gnueabihf g++-aarch64-linux-gnu
+
+      - name: Build
+        shell: bash
+        run: |
+          ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release host
+
+      - name: List artifacts
+        run: ls -lR build/artifacts/*-release/lib/*
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: build-linux
+          path: build/artifacts/*-release/lib/*
+          if-no-files-found: error
+
+  build_android:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Setup NDK
+        id: setup-ndk
+        uses: nttld/setup-ndk@afb4c9964b521afb97c864b7d40b11e6911bd410 # v1.5.0
+        with:
+          ndk-version: r27d
+          add-to-path: false
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get --show-upgraded --yes install ninja-build
+
+      - name: Build
+        shell: bash
+        env:
+          ANDROID_NDK_HOME: ${{ steps.setup-ndk.outputs.ndk-path }}
+        run: |
+          ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release android
+
+      - name: List artifacts
+        run: ls -lR build/artifacts/*-release/lib/*
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: build-android
+          path: build/artifacts/*-release/lib/*
+          if-no-files-found: error
+
+  build_freebsd:
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Build in FreeBSD
+        uses: vmactions/freebsd-vm@487ce35b96fae3e60d45b521735f5aa436ecfade # v1.2.4
+        with:
+          release: 14.3
+          usesh: true
+          prepare: |
+            pkg install -y ninja bash cmake gcc
+          run: |
+            bash ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release host
+            strip --strip-all build/artifacts/*-release/lib/*.so
+
+      - name: List artifacts
+        run: ls -lR build/artifacts/*-release/lib/*
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: build-freebsd
+          path: build/artifacts/*-release/lib/*
+          if-no-files-found: error
+
+  build_mac:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Build
+        shell: bash
+        run: |
+          ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release host
+
+      - name: List artifacts
+        run: ls -lR build/artifacts/*-release/lib/*
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: build-mac
+          path: build/artifacts/*-release/lib/*
+          if-no-files-found: error
+
+  build_mac_catalyst:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Build
+        shell: bash
+        run: |
+          ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release catalyst
+
+      - name: List artifacts
+        run: ls -lR build/artifacts/*-release/lib/*
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: build-mac-catalyst
+          path: build/artifacts/*-release/lib/*
+          if-no-files-found: error
+
+  build_ios:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Build
+        shell: bash
+        run: |
+          ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release ios
+
+      - name: List artifacts
+        run: ls -lR build/artifacts/*-release/lib/*
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: build-ios
+          path: build/artifacts/*-release/lib/*
+          if-no-files-found: error
+
+  build_tvos:
+    runs-on: macos-latest
+    steps:
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Build
+        shell: bash
+        run: |
+          ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release tvos
+
+      - name: List artifacts
+        run: ls -lR build/artifacts/*-release/lib/*
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: build-tvos
+          path: build/artifacts/*-release/lib/*
+          if-no-files-found: error
+
+  test:
+    needs:
+      - build_linux
+      - build_android
+      - build_freebsd
+      - build_mac
+      - build_mac_catalyst
+      - build_ios
+      - build_tvos
+    runs-on: ubuntu-latest
+    continue-on-error: true
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Apply patches
+        working-directory: build
+        run: |
+          git apply --stat --apply ../patches/freebsd.patch
+
+      - name: Download artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: build-*
+          path: build/artifacts
+          merge-multiple: true
+
+      - name: List artifacts
+        run: ls -lR build/artifacts
+
+      - name: Build managed
+        shell: bash
+        run: |
+          ./build/build.sh --no-color --verbose --managed-verbosity normal --configuration Release managed
+
+      - name: Test
+        shell: bash
+        run: |
+          ./build/build.sh --no-color --verbose --managed-verbosity diag --configuration Release --no-build test
+
+  package:
+    needs:
+      - build_linux
+      - build_android
+      - build_freebsd
+      - build_mac
+      - build_mac_catalyst
+      - build_ios
+      - build_tvos
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+
+      - name: Checkout Mono.Posix
+        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        with:
+          repository: mono/mono.posix
+          ref: main
+          path: build
+          submodules: true
+
+      - name: Apply patches
+        working-directory: build
+        run: |
+          git apply --stat --apply ../patches/freebsd.patch
+
+      - name: Setup variables
+        id: variables
+        run: |
+          echo "build_id=$(date +%Y%m%d).0" >> $GITHUB_OUTPUT
+
+      - name: Download artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          pattern: build-*
+          path: build/artifacts
+          merge-multiple: true
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: artifacts
+          path: build/artifacts
+          if-no-files-found: error
+
+      - name: List artifacts
+        run: ls -lR build/artifacts
+
+      - name: Package
+        shell: bash
+        run: >-
+          ./build/eng/common/build.sh
+          -restore
+          -build
+          -pack
+          -ci
+          -configuration Release
+          -projects ${{ github.workspace }}/build/Mono.Unix.sln
+          -p:PackageAllNativeLibs=true
+          -p:OfficialBuildId=${{ steps.variables.outputs.build_id }}
+          -p:PreReleaseVersionIteration=${{ github.run_number }}
+
+      - name: Upload artifacts
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        with:
+          name: packages
+          path: build/artifacts/packages/Release/Shipping/Mono.*.nupkg
+          if-no-files-found: error
+
+  release:
+    needs:
+      - prepare
+      - test
+      - package
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'main'
+    steps:
+      - name: Download packages artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: packages
+          path: packages
+
+      - name: Create release
+        uses: ncipollo/release-action@b7eabc95ff50cbeeedec83973935c8f306dfcd0b # v1.20.0
+        with:
+          artifacts: packages/Mono.*.nupkg
+          artifactErrorsFailBuild: true
+          draft: false
+          generateReleaseNotes: false
+          skipIfReleaseExists: true
+          immutableCreate: true
+          name: v${{ needs.prepare.outputs.version_prefix }} (build ${{ github.run_number }})
+          tag: v${{ needs.prepare.outputs.version_prefix }}.${{ github.run_number }}
+
+  publish:
+    needs: release
+    runs-on: ubuntu-latest
+    permissions:
+      packages: write
+    if: github.event_name == 'workflow_dispatch' && github.ref_name == 'main'
+    steps:
+      - name: Download packages artifacts
+        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        with:
+          name: packages
+          path: packages
+
+      - name: Push to GitHub
+        shell: bash
+        run: >-
+          dotnet nuget push
+          packages/Mono.Unix.*.nupkg
+          --no-symbols
+          --skip-duplicate
+          --source https://nuget.pkg.github.com/${{ github.repository_owner }}/index.json
+          --api-key ${{ secrets.GITHUB_TOKEN }}
