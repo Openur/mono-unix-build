@@ -35,7 +35,7 @@ jobs:
           submodules: true
 
       - name: Build
-        uses: docker://docker.io/debian:bullseye
+        uses: docker://docker.io/debian:trixie
         with:
           args: /bin/sh -c "apt-get update && apt-get --yes install build-essential ninja-build g++-arm-linux-gnueabihf g++-aarch64-linux-gnu && ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release host"
 
