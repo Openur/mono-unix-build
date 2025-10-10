@@ -35,7 +35,7 @@ jobs:
           submodules: true
 
       - name: Build
-        uses: docker://docker.io/debian:11
+        uses: docker://docker.io/debian:13
         with:
           args: /bin/sh -c "apt-get update && apt-get --yes install ninja-build g++-arm-linux-gnueabihf g++-aarch64-linux-gnu && ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release host"
 
