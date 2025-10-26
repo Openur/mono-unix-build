@@ -78,7 +78,7 @@ jobs:
         run: ls -lR build/artifacts/*-release/lib/*
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: build-linux
           path: build/artifacts/*-release/lib/*
@@ -118,7 +118,7 @@ jobs:
         run: ls -lR build/artifacts/*-release/lib/*
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: build-android
           path: build/artifacts/*-release/lib/*
@@ -150,7 +150,7 @@ jobs:
         run: ls -lR build/artifacts/*-release/lib/*
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: build-freebsd
           path: build/artifacts/*-release/lib/*
@@ -176,7 +176,7 @@ jobs:
         run: ls -lR build/artifacts/*-release/lib/*
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: build-mac
           path: build/artifacts/*-release/lib/*
@@ -202,7 +202,7 @@ jobs:
         run: ls -lR build/artifacts/*-release/lib/*
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: build-mac-catalyst
           path: build/artifacts/*-release/lib/*
@@ -228,7 +228,7 @@ jobs:
         run: ls -lR build/artifacts/*-release/lib/*
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: build-ios
           path: build/artifacts/*-release/lib/*
@@ -254,7 +254,7 @@ jobs:
         run: ls -lR build/artifacts/*-release/lib/*
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: build-tvos
           path: build/artifacts/*-release/lib/*
@@ -289,7 +289,7 @@ jobs:
           git apply --stat --apply ../patches/freebsd.patch
 
       - name: Download artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           pattern: build-*
           path: build/artifacts
@@ -344,14 +344,14 @@ jobs:
           echo "owner=${OWNER,,}" >> $GITHUB_OUTPUT
 
       - name: Download artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           pattern: build-*
           path: build/artifacts
           merge-multiple: true
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: artifacts
           path: build/artifacts
@@ -375,7 +375,7 @@ jobs:
           -p:PreReleaseVersionIteration=${{ github.run_number }}-${{ steps.variables.outputs.owner }}
 
       - name: Upload artifacts
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4.6.2
+        uses: actions/upload-artifact@330a01c490aca151604b8cf639adc76d48f6c5d4 # v5.0.0
         with:
           name: packages
           path: build/artifacts/packages/Release/Shipping/Mono.*.nupkg
@@ -392,7 +392,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref_name == 'main'
     steps:
       - name: Download packages artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: packages
           path: packages
@@ -417,7 +417,7 @@ jobs:
     if: github.event_name == 'workflow_dispatch' && github.ref_name == 'main'
     steps:
       - name: Download packages artifacts
-        uses: actions/download-artifact@634f93cb2916e3fdff6788551b99b062d0335ce0 # v5.0.0
+        uses: actions/download-artifact@018cc2cf5baa6db3ef3c5f8a56943fffe632ef53 # v6.0.0
         with:
           name: packages
           path: packages
