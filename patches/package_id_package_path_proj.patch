@@ -1,0 +1,13 @@
+diff --git a/src/Mono.Unix/Mono.Unix.proj b/src/Mono.Unix/Mono.Unix.proj
+index 82e43a1..deefbb1 100644
+--- a/src/Mono.Unix/Mono.Unix.proj
++++ b/src/Mono.Unix/Mono.Unix.proj
+@@ -287,7 +287,7 @@
+ 
+   <ItemGroup>
+     <Content Include="$(MSBuildThisFileDirectory)Mono.Unix.targets">
+-      <PackagePath>build</PackagePath>
++      <PackagePath>build/$(PackageId).targets</PackagePath>
+     </Content>
+   </ItemGroup>
+ </Project>
