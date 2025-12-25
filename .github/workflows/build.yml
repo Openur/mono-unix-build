@@ -136,7 +136,7 @@ jobs:
           submodules: true
 
       - name: Build in FreeBSD
-        uses: vmactions/freebsd-vm@0cd283ca698d48b59cda444a9948f48a30709627 # v1.2.8
+        uses: vmactions/freebsd-vm@7f2dece6c9e625baea395c40bdf5b004bb8eea20 # v1.3.1
         with:
           release: 14.3
           usesh: true
