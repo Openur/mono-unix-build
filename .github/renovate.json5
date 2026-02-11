@@ -7,6 +7,7 @@
     ":semanticCommits"
   ],
   dependencyDashboardTitle: "Renovate Dashboard",
+  minimumReleaseAge: "3 day",
   schedule: [
     "* * * * *"
   ],
@@ -35,7 +36,7 @@
       automerge: true,
       automergeType: "pr",
       matchUpdateTypes: ["minor", "patch", "digest"],
-      minimumReleaseAge: "1 minute",
+      minimumReleaseAge: "3 hours",
       ignoreTests: false,
     },
     {
@@ -84,7 +85,7 @@
     {
       matchManagers: ["github-actions"],
       matchPackageNames: ["/docker\.io\/debian/"],
-      enabled: false,
+      allowedVersions: "==11"
     },
   ]
 }
