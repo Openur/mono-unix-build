@@ -455,7 +455,7 @@ jobs:
           --publish
           --ci
           --configuration Release
-          --verbosity detailed
+          --verbosity normal
           --projects ${{ github.workspace }}/build/Mono.Unix.sln
           -p:PackageAllNativeLibs=true
           -p:Version=${{ needs.prepare.outputs.version_prefix }}.${{ github.run_number }}

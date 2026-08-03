@@ -23,18 +23,51 @@ index 718c654..24fd625 100644
  
    <Import Project="../../Mono.Unix.Common.props" />
 diff --git a/src/Mono.Unix/Mono.Unix.proj b/src/Mono.Unix/Mono.Unix.proj
-index 82e43a1..3fbbc0b 100644
+index 82e43a1..f9ef27c 100644
 --- a/src/Mono.Unix/Mono.Unix.proj
 +++ b/src/Mono.Unix/Mono.Unix.proj
-@@ -289,5 +289,8 @@
-     <Content Include="$(MSBuildThisFileDirectory)Mono.Unix.targets">
+@@ -279,14 +279,14 @@
+       <Output TaskParameter="NuGetShortFolderName" PropertyName="_NuGetShortFolderName" />
+     </GetNuGetShortFolderName>
+     <ItemGroup>
+-      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Mono.Unix.dll.config">
++      <TfmSpecificPackageFile Include="$(MSBuildThisFileDirectory)Openur.Mono.Unix.dll.config">
+         <PackagePath>lib/$(_NuGetShortFolderName)</PackagePath>
+       </TfmSpecificPackageFile>
+     </ItemGroup>
+   </Target>
+ 
+   <ItemGroup>
+-    <Content Include="$(MSBuildThisFileDirectory)Mono.Unix.targets">
++    <Content Include="$(MSBuildThisFileDirectory)Openur.Mono.Unix.targets">
        <PackagePath>build</PackagePath>
      </Content>
-+    <Content Include="$(MSBuildThisFileDirectory)Openur.Mono.Unix.targets">
-+      <PackagePath>build</PackagePath>
-+    </Content>
    </ItemGroup>
- </Project>
+diff --git a/src/Mono.Unix/Mono.Unix.targets b/src/Mono.Unix/Mono.Unix.targets
+index da5fc32..9293d79 100644
+--- a/src/Mono.Unix/Mono.Unix.targets
++++ b/src/Mono.Unix/Mono.Unix.targets
+@@ -51,7 +51,7 @@
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </None>
+ 
+-    <None Include="$(MSBuildThisFileDirectory)../lib/net45/Mono.Unix.dll.config">
++    <None Include="$(MSBuildThisFileDirectory)../lib/net45/Openur.Mono.Unix.dll.config">
+       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+     </None>
+   </ItemGroup>
+diff --git a/src/Mono.Unix/Openur.Mono.Unix.dll.config b/src/Mono.Unix/Openur.Mono.Unix.dll.config
+new file mode 100644
+index 0000000..84187e8
+--- /dev/null
++++ b/src/Mono.Unix/Openur.Mono.Unix.dll.config
+@@ -0,0 +1,6 @@
++<?xml version="1.0" encoding="utf-8"?>
++<configuration>
++  <dllmap dll="Openur.Mono.Unix" os="linux" cpu="x86-64" wordsize="64" target="runtimes/linux-x64/libMono.Unix.so" />
++  <dllmap dll="Openur.Mono.Unix" os="osx" cpu="x86-64" wordsize="64" target="runtimes/osx-x64/libMono.Unix.dylib" />
++  <dllmap dll="Openur.Mono.Unix" os="osx" cpu="armv8" wordsize="64" target="runtimes/osx-arm64/libMono.Unix.dylib" />
++</configuration>
 diff --git a/src/Mono.Unix/Openur.Mono.Unix.targets b/src/Mono.Unix/Openur.Mono.Unix.targets
 new file mode 120000
 index 0000000..52b2d2e
