@@ -111,12 +111,12 @@ jobs:
         working-directory: build
         run: |
           git apply --stat --apply ../patches/arm-32bit-large-file-support.patch
-          git apply --stat --apply ../patches/build_single_arch.patch
+          git apply --stat --apply ../patches/build_native.patch
 
       - name: Build
         uses: docker://mirror.gcr.io/alpine:3.24
         with:
-          args: /bin/sh -c "apk add -U --no-cache bash alpine-sdk cmake make samurai && ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release host"
+          args: /bin/sh -c "apk add -U --no-cache bash alpine-sdk cmake make samurai && ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release native"
 
       - name: Prepare build artifact
         run: sudo mv build/artifacts/host-linux-x64-release build/artifacts/host-linux-musl-${{ matrix.architecture }}-release
@@ -199,7 +199,7 @@ jobs:
       - name: Apply patches
         working-directory: build
         run: |
-          git apply --stat --apply ../patches/build_single_arch.patch
+          git apply --stat --apply ../patches/build_native.patch
 
       - name: Build in FreeBSD
         uses: vmactions/freebsd-vm@77ed28d336d03fe19a3f4f7266c1d2c4714dd79d # v1.5.2
@@ -210,7 +210,7 @@ jobs:
           prepare: |
             pkg install -y ninja bash cmake gcc
           run: |
-            bash ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release host
+            bash ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release native
             strip --strip-all build/artifacts/*-release/lib/*.so
 
       - name: Prepare build artifact
@@ -344,6 +344,7 @@ jobs:
   test:
     needs:
       - build_linux
+      - build_linux_musl
       - build_android
       - build_freebsd
       - build_mac
@@ -368,6 +369,8 @@ jobs:
         working-directory: build
         run: |
           git apply --stat --apply ../patches/freebsd.patch
+          git apply --stat --apply ../patches/linux_musl.patch
+          git apply --stat --apply ../patches/renamed_package.patch
 
       - name: Download artifacts
         uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
@@ -419,6 +422,7 @@ jobs:
           git apply --stat --apply ../patches/freebsd.patch
           git apply --stat --apply ../patches/linux_musl.patch
           git apply --stat --apply ../patches/renamed_package.patch
+          git apply --stat --apply ../patches/dotnet_10.patch
 
       - name: Setup variables
         id: variables
@@ -452,7 +456,7 @@ jobs:
           --publish
           --ci
           --configuration Release
-          --verbosity detailed
+          --verbosity normal
           --projects ${{ github.workspace }}/build/Mono.Unix.sln
           -p:PackageAllNativeLibs=true
           -p:Version=${{ needs.prepare.outputs.version_prefix }}.${{ github.run_number }}

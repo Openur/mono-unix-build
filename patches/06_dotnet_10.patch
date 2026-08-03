@@ -1,0 +1,38 @@
+diff --git a/src/Mono.Posix/Mono.Posix.csproj b/src/Mono.Posix/Mono.Posix.csproj
+index 5978aef..a4ca087 100644
+--- a/src/Mono.Posix/Mono.Posix.csproj
++++ b/src/Mono.Posix/Mono.Posix.csproj
+@@ -1,6 +1,6 @@
+ <Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net6.0;net45</TargetFrameworks>
++    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net6.0;net10.0;net45</TargetFrameworks>
+     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+     <IsPackable>true</IsPackable>
+     <AssemblyName>Openur.Mono.Posix</AssemblyName>
+diff --git a/src/Mono.Unix/Mono.Unix.csproj b/src/Mono.Unix/Mono.Unix.csproj
+index 24fd625..e52db05 100644
+--- a/src/Mono.Unix/Mono.Unix.csproj
++++ b/src/Mono.Unix/Mono.Unix.csproj
+@@ -1,6 +1,6 @@
+ <Project Sdk="Microsoft.NET.Sdk">
+   <PropertyGroup>
+-    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net6.0;net45</TargetFrameworks>
++    <TargetFrameworks>netstandard2.0;netstandard2.1;netcoreapp3.1;net6.0;net10.0;net45</TargetFrameworks>
+     <GenerateAssemblyTitleAttribute>false</GenerateAssemblyTitleAttribute>
+     <Nullable>enable</Nullable>
+     <IsPackable>true</IsPackable>
+diff --git a/src/Mono.Unix/Mono.Unix/UnixIOException.cs b/src/Mono.Unix/Mono.Unix/UnixIOException.cs
+index 923e7aa..ad06525 100644
+--- a/src/Mono.Unix/Mono.Unix/UnixIOException.cs
++++ b/src/Mono.Unix/Mono.Unix/UnixIOException.cs
+@@ -79,6 +79,9 @@ namespace Mono.Unix {
+ 			this.errno = 0;
+ 		}
+ 
++#if NET8_0_OR_GREATER
++		[Obsolete(DiagnosticId = "SYSLIB0051")]
++#endif
+ 		protected UnixIOException (SerializationInfo info, StreamingContext context)
+ 			: base (info, context)
+ 		{

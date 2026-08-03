@@ -1,0 +1,18 @@
+diff --git a/build.sh b/build.sh
+index e26676f..d139d0c 100755
+--- a/build.sh
++++ b/build.sh
+@@ -206,6 +206,13 @@ function __build_host()
+ 	HOST_BUILT="yes"
+ }
+ 
++function __build_native()
++{
++	print_build_banner_native "${OS}"
++
++	build_common ${HOST_BUILD_NAME}-x64 -DTARGET_PLATFORM=host-${OS_LOWER}-x64
++}
++
+ function __build_android()
+ {
+ 	print_build_banner_native Android
