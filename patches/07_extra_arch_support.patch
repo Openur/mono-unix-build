@@ -1,0 +1,19 @@
+diff --git a/src/native/fstab.cc b/src/native/fstab.cc
+index c0e5778..1da2ac2 100644
+--- a/src/native/fstab.cc
++++ b/src/native/fstab.cc
+@@ -321,6 +321,14 @@ Mono_Posix_Syscall_setfsent ()
+ 
+ #endif /* def HAVE_FSTAB_H || def HAVE_CHECKPOINT_H || def HAVE_SYS_VFSTAB_H */
+ 
++#if !defined (HAVE_FSTAB_H) && !defined (HAVE_SYS_VFSTAB_H)
++int32_t
++Mono_Posix_Syscall_getfsfile (const char *mount_point, struct Mono_Posix_Syscall__Fstab *fsbuf)
++{
++  return 1;
++}
++#endif /* !def HAVE_FSTAB_H && !def HAVE_SYS_VFSTAB_H */
++
+ /*
+  * vim: noexpandtab
+  */
