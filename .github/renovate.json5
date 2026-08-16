@@ -15,6 +15,24 @@
     "prEditedNotification",
     "prIgnoreNotification"
   ],
+  registryAliases: {
+    "mirror.gcr.io": "docker.io",
+  },
+  customManagers: [
+    {
+      customType: "regex",
+      managerFilePatterns: [
+        "/^\\.github/workflows/.+\\.ya?ml$/",
+      ],
+      matchStrings: [
+        "UPSTREAM_MONO_BRANCH_REF:\\s*(?<currentDigest>.*?)\\n",
+      ],
+      currentValueTemplate: "main",
+      depNameTemplate: "mono.posix",
+      packageNameTemplate: "https://github.com/mono/mono.posix",
+      datasourceTemplate: "git-refs",
+    },
+  ],
   packageRules: [
     {
       description: "GitHub Actions Group",
