@@ -76,9 +76,9 @@ jobs:
           git apply --stat --apply ../patches/07_extra_arch_support.patch
 
       - name: Build
-        uses: docker://mirror.gcr.io/debian:trixie
+        uses: docker://mirror.gcr.io/debian:13.6
         with:
-          args: /bin/sh -c "apt-get update && apt-get upgrade --yes && apt-get --yes install build-essential cmake ninja-build g++-arm-linux-gnueabihf g++-aarch64-linux-gnu && CC=gcc-14 CXX=g++-14 ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release host"
+          args: /bin/sh -c "export DEBIAN_FRONTEND=noninteractive; apt-get update && apt-get upgrade --yes && apt-get --yes install build-essential cmake ninja-build g++-arm-linux-gnueabihf g++-aarch64-linux-gnu && CC=gcc-14 CXX=g++-14 ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release host"
 
       - name: List artifacts
         run: |
@@ -125,7 +125,7 @@ jobs:
           git apply --stat --apply ../patches/07_extra_arch_support.patch
 
       - name: Build
-        uses: docker://mirror.gcr.io/alpine:3.24
+        uses: docker://mirror.gcr.io/alpine:3.24.1
         with:
           args: /bin/sh -c "apk add -U --no-cache bash alpine-sdk cmake make samurai && ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release native"
 
