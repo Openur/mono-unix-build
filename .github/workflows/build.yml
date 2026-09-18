@@ -125,7 +125,7 @@ jobs:
           git apply --stat --apply ../patches/07_extra_arch_support.patch
 
       - name: Build
-        uses: docker://mirror.gcr.io/alpine:3.24.1
+        uses: docker://mirror.gcr.io/alpine:3.24.2
         with:
           args: /bin/sh -c "apk add -U --no-cache bash alpine-sdk cmake make samurai && ./build/build.sh --no-color --verbose --managed-verbosity detailed --configuration Release native"
 
